@@ -41,13 +41,13 @@ func flowLayout<Elements>(
     for elements: Elements,
     sizes: [Elements.Element.ID: CGSize],
     containerSize: CGSize
-) -> [Elements.Element.ID: CGSize] where Elements: RandomAccessCollection, Elements.Element: Identifiable {
+) -> [(Elements.Element.ID, CGSize)] where Elements: RandomAccessCollection, Elements.Element: Identifiable {
     var state = FlowLayout(containerSize: containerSize)
-    var result: [Elements.Element.ID: CGSize] = [:]
+    var result: [(Elements.Element.ID, CGSize)] = []
 
     for element in elements {
         let rect = state.add(element: sizes[element.id] ?? .zero)
-        result[element.id] = CGSize(width: rect.origin.x, height: rect.origin.y)
+        result.append((element.id, CGSize(width: rect.origin.x, height: rect.origin.y)))
     }
 
     return result
