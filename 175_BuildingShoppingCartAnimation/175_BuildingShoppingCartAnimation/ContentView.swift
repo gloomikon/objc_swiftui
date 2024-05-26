@@ -68,6 +68,10 @@ struct AppearFrom: ViewModifier {
     }
 }
 
+prefix func -(size: CGSize) -> CGSize {
+    CGSize(width: -size.width, height: -size.height)
+}
+
 extension View {
 
     func overlayWithAnchor<A, V: View>(
@@ -89,6 +93,37 @@ extension View {
     }
 }
 
+struct Draggable: ViewModifier {
+
+    @GestureState private var state: DragGesture.Value? = nil
+
+    func body(content: Content) -> some View {
+        ZStack {
+            content
+                .highPriorityGesture(
+                    DragGesture().updating($state) { value, state, _ in
+                        state = value
+                    }
+                )
+
+            if let state {
+                content
+                    .offset(state.translation)
+                    .transition(.offset(-state.translation))
+                    .animation(.default)
+
+            }
+        }
+    }
+}
+
+extension View {
+
+    func draggable() -> some View {
+        modifier(Draggable())
+    }
+}
+
 struct ContentView: View {
 
     @State private var cartItems: [(idx: Int, anchor: Anchor<CGPoint>)] = []
@@ -104,6 +139,7 @@ struct ContentView: View {
                                 cartItems.append((idx: idx, anchor: anchor))
                             } label: { Color.clear }
                         }
+                        .draggable()
                 }
             }
 
@@ -119,6 +155,9 @@ struct ContentView: View {
             }
             .animation(.default, value: cartItems.count)
             .frame(height: 50)
+            .frame(maxWidth: .infinity, alignment: .center)
+            .padding()
+            .background(.gray)
 
             Spacer()
         }
