@@ -34,17 +34,58 @@ struct ShoppingItem: View {
     }
 }
 
-struct AnchorKey: PreferenceKey {
+struct AnchorKey<A>: PreferenceKey {
 
-    static var defaultValue: Anchor<CGPoint>? {
+    typealias Value = Anchor<A>?
+
+    static var defaultValue: Value {
         nil
     }
 
     static func reduce(
-        value: inout Anchor<CGPoint>?,
-        nextValue: () -> Anchor<CGPoint>?
+        value: inout Value,
+        nextValue: () -> Value
     ) {
         value = nextValue()
+    }
+}
+
+struct AppearFrom: ViewModifier {
+
+    @State private var didAppear = false
+
+    let anchor: Anchor<CGPoint>
+
+    func body(content: Content) -> some View {
+        GeometryReader { proxy in
+            content
+                .offset(didAppear ? .zero : CGSize(width: proxy[anchor].x, height: proxy[anchor].y))
+                .onAppear {
+                    didAppear = true
+                }
+                .animation(.default, value: didAppear)
+        }
+    }
+}
+
+extension View {
+
+    func overlayWithAnchor<A, V: View>(
+        value: Anchor<A>.Source,
+        transform: @escaping (Anchor<A>) -> V
+    ) -> some View {
+        anchorPreference(
+            key: AnchorKey<A>.self,
+            value: value,
+            transform: { anchor in anchor }
+        )
+        .overlayPreferenceValue(AnchorKey<A>.self) { anchor in
+            transform(anchor!)
+        }
+    }
+
+    func appearFrom(anchor: Anchor<CGPoint>) -> some View {
+        modifier(AppearFrom(anchor: anchor))
     }
 }
 
@@ -57,44 +98,28 @@ struct ContentView: View {
             Spacer()
             HStack {
                 ForEach(0..<colors.count, id: \.self) { idx in
-
                     ShoppingItem(index: idx)
-                        .anchorPreference(
-                            key: AnchorKey.self,
-                            value: .topLeading,
-                            transform: { anchor in anchor }
-                        )
-                        .overlayPreferenceValue(AnchorKey.self) { anchor in
+                        .overlayWithAnchor(value: .topLeading) { anchor in
                             Button {
-                                withAnimation {
-                                    cartItems.append((idx: idx, anchor: anchor!))
-                                }
+                                cartItems.append((idx: idx, anchor: anchor))
                             } label: { Color.clear }
                         }
                 }
             }
 
             Spacer()
-            RoundedRectangle(cornerRadius: 5)
-                .fill(.gray)
-                .frame(width: 100, height: 100)
-                .overlay {
-                    Text("\(cartItems.count)")
-                }
-                .background {
-                    GeometryReader { proxy in
-                        ZStack {
-                            ForEach(Array(cartItems.enumerated()), id: \.offset) { _, item in
-                                ShoppingItem(index: item.idx)
-                                    .transition(.offset(
-                                        x: proxy[item.anchor].x,
-                                        y: proxy[item.anchor].y
-                                    ))
-                            }
-                        }
-                    }
+
+
+            HStack {
+                ForEach(Array(cartItems.enumerated()), id: \.offset) { idx, item in
+                    ShoppingItem(index: item.idx)
+                        .appearFrom(anchor: item.anchor)
                     .frame(width: 50, height: 50)
                 }
+            }
+            .animation(.default, value: cartItems.count)
+            .frame(height: 50)
+
             Spacer()
         }
     }
