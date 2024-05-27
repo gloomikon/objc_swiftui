@@ -50,6 +50,34 @@ struct AnchorKey<A>: PreferenceKey {
     }
 }
 
+struct DragRectKey: PreferenceKey {
+
+    typealias Value = CGRect?
+
+    static var defaultValue: Value { nil }
+
+    static func reduce(
+        value: inout Value,
+        nextValue: () -> Value
+    ) {
+        value = value ?? nextValue()
+    }
+}
+
+struct DropRectKey: PreferenceKey {
+
+    typealias Value = CGRect?
+
+    static var defaultValue: Value { nil }
+
+    static func reduce(
+        value: inout Value,
+        nextValue: () -> Value
+    ) {
+        value = value ?? nextValue()
+    }
+}
+
 struct AppearFrom: ViewModifier {
 
     @State private var didAppear = false
@@ -108,6 +136,10 @@ struct Draggable: ViewModifier {
 
             if let state {
                 content
+                    .overlay { GeometryReader { proxy in
+                        let rect = proxy.frame(in: .global)
+                        Color.clear.preference(key: DragRectKey.self, value: rect)
+                    }}
                     .offset(state.translation)
                     .transition(.offset(-state.translation))
                     .animation(.default)
@@ -127,6 +159,13 @@ extension View {
 struct ContentView: View {
 
     @State private var cartItems: [(idx: Int, anchor: Anchor<CGPoint>)] = []
+    @State private var dragRect: CGRect?
+    @State private var dropRect: CGRect?
+
+    private var isInDropZone: Bool {
+        guard let dragRect, let dropRect else { return false }
+        return dragRect.intersects(dropRect)
+    }
 
     var body: some View {
         VStack {
@@ -157,9 +196,19 @@ struct ContentView: View {
             .frame(height: 50)
             .frame(maxWidth: .infinity, alignment: .center)
             .padding()
-            .background(.gray)
+            .background(Color(white: isInDropZone ? 0.7 : 0.5))
+            .overlay { GeometryReader { proxy in
+                let rect = proxy.frame(in: .global)
+                Color.clear.preference(key: DropRectKey.self, value: rect)
+            }}
 
             Spacer()
+        }
+        .onPreferenceChange(DragRectKey.self) { value in
+            dragRect = value
+        }
+        .onPreferenceChange(DropRectKey.self) { value in
+            dropRect = value
         }
     }
 }
