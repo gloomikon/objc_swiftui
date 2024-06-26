@@ -13,6 +13,8 @@
 		772F65FD2C2C6561003F2F94 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 772F65FC2C2C6561003F2F94 /* Preview Assets.xcassets */; };
 		772F66042C2C672A003F2F94 /* CircleButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 772F66032C2C672A003F2F94 /* CircleButtonStyle.swift */; };
 		772F66062C2C683E003F2F94 /* EqualSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 772F66052C2C683E003F2F94 /* EqualSize.swift */; };
+		772F66082C2C69D5003F2F94 /* Stopwatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 772F66072C2C69D5003F2F94 /* Stopwatch.swift */; };
+		772F660A2C2C787D003F2F94 /* TimeInterval+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 772F66092C2C787D003F2F94 /* TimeInterval+Extension.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,6 +25,8 @@
 		772F65FC2C2C6561003F2F94 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		772F66032C2C672A003F2F94 /* CircleButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleButtonStyle.swift; sourceTree = "<group>"; };
 		772F66052C2C683E003F2F94 /* EqualSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EqualSize.swift; sourceTree = "<group>"; };
+		772F66072C2C69D5003F2F94 /* Stopwatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stopwatch.swift; sourceTree = "<group>"; };
+		772F66092C2C787D003F2F94 /* TimeInterval+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeInterval+Extension.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,7 +61,9 @@
 			children = (
 				772F65F52C2C655F003F2F94 /* _80_StopwatchAppApp.swift */,
 				772F65F72C2C655F003F2F94 /* ContentView.swift */,
+				772F66092C2C787D003F2F94 /* TimeInterval+Extension.swift */,
 				772F66052C2C683E003F2F94 /* EqualSize.swift */,
+				772F66072C2C69D5003F2F94 /* Stopwatch.swift */,
 				772F66032C2C672A003F2F94 /* CircleButtonStyle.swift */,
 				772F65F92C2C6561003F2F94 /* Assets.xcassets */,
 				772F65FB2C2C6561003F2F94 /* Preview Content */,
@@ -146,7 +152,9 @@
 				772F66042C2C672A003F2F94 /* CircleButtonStyle.swift in Sources */,
 				772F66062C2C683E003F2F94 /* EqualSize.swift in Sources */,
 				772F65F82C2C655F003F2F94 /* ContentView.swift in Sources */,
+				772F66082C2C69D5003F2F94 /* Stopwatch.swift in Sources */,
 				772F65F62C2C655F003F2F94 /* _80_StopwatchAppApp.swift in Sources */,
+				772F660A2C2C787D003F2F94 /* TimeInterval+Extension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
