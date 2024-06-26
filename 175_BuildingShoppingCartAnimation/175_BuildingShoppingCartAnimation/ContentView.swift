@@ -19,6 +19,8 @@ struct ContentView: View {
                     ShoppingItem(index: idx)
                         .draggable(snapBack: !isInDropZone) { anchor in
                             cartItems.append((idx: idx, anchor: anchor))
+                        } onDragged: { rect in
+                            dragRect = rect
                         } onEnded: { anchor in
                             guard isInDropZone else { return }
                             cartItems.append((idx: idx, anchor: anchor))
@@ -33,7 +35,6 @@ struct ContentView: View {
                 ForEach(Array(cartItems.enumerated()), id: \.offset) { idx, item in
                     ShoppingItem(index: item.idx)
                         .appearFrom(anchor: item.anchor)
-                        .frame(width: 50, height: 50)
                         .transition(.identity)
                 }
             }
@@ -42,18 +43,13 @@ struct ContentView: View {
             .frame(maxWidth: .infinity, alignment: .center)
             .padding()
             .background(Color(white: isInDropZone ? 0.7 : 0.5))
-            .overlay { GeometryReader { proxy in
-                let rect = proxy.frame(in: .global)
-                Color.clear.preference(key: DropRectKey.self, value: rect)
-            }}
+            .onGeometryChange { 
+                proxy in proxy.frame(in: .global)
+            } onChange: { value in
+                dropRect = value
+            }
 
             Spacer()
-        }
-        .onPreferenceChange(DragRectKey.self) { value in
-            dragRect = value
-        }
-        .onPreferenceChange(DropRectKey.self) { value in
-            dropRect = value
         }
     }
 }

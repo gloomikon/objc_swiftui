@@ -7,6 +7,7 @@ struct Draggable<Content: View>: View {
     let content: Content
     let snapBack: Bool
     let onTapped: (Anchor<CGPoint>) -> Void
+    let onDragged: (CGRect) -> Void
     let onEnded: (Anchor<CGPoint>) -> Void
 
     var body: some View {
@@ -27,14 +28,14 @@ struct Draggable<Content: View>: View {
 
             if let state {
                 content
-                    .overlay { GeometryReader { proxy in
-                        let rect = proxy.frame(in: .global)
-                        Color.clear.preference(key: DragRectKey.self, value: rect)
-                    }}
+                    .onGeometryChange {
+                        proxy in proxy.frame(in: .global)
+                    } onChange: { value in
+                        onDragged(value)
+                    }
                     .offset(state.translation)
                     .transition(.offset(snapBack ? -state.translation : .zero))
                     .animation(.default)
-
             }
         }
     }
@@ -45,12 +46,14 @@ extension View {
     func draggable(
         snapBack: Bool,
         onTapped: @escaping (Anchor<CGPoint>) -> Void,
+        onDragged: @escaping (CGRect) -> Void,
         onEnded: @escaping (Anchor<CGPoint>) -> Void
     ) -> some View {
         Draggable(
             content: self,
             snapBack: snapBack,
             onTapped: onTapped,
+            onDragged: onDragged,
             onEnded: onEnded
         )
     }
