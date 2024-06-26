@@ -7,9 +7,15 @@ struct ContentView: View {
     var body: some View {
         VStack {
 
-            Text(stopwatch.total.formatted)
-                .font(.largeTitle)
-                .monospacedDigit()
+//            Text(stopwatch.total.formatted)
+//                .font(.largeTitle)
+//                .monospacedDigit()
+
+            AnalogClockView(
+                time: stopwatch.total,
+                lapTime: stopwatch.laps.last?.0
+            )
+
             HStack {
                 EitherView(if: stopwatch.isRunning) {
                     Button("Lap") {
