@@ -13,7 +13,6 @@ private let numbersFormatter: NumberFormatter = {
     formatter.maximumFractionDigits = 2
     formatter.minimumIntegerDigits = 0
     formatter.alwaysShowsDecimalSeparator = true
-    formatter.decimalSeparator = "."
     return formatter
 }()
 

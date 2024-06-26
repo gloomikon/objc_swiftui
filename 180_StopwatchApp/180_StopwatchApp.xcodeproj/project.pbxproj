@@ -15,6 +15,7 @@
 		772F66062C2C683E003F2F94 /* EqualSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 772F66052C2C683E003F2F94 /* EqualSize.swift */; };
 		772F66082C2C69D5003F2F94 /* Stopwatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 772F66072C2C69D5003F2F94 /* Stopwatch.swift */; };
 		772F660A2C2C787D003F2F94 /* TimeInterval+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 772F66092C2C787D003F2F94 /* TimeInterval+Extension.swift */; };
+		77676FA42C2CB51200291F31 /* EitherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77676FA32C2CB51200291F31 /* EitherView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +28,7 @@
 		772F66052C2C683E003F2F94 /* EqualSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EqualSize.swift; sourceTree = "<group>"; };
 		772F66072C2C69D5003F2F94 /* Stopwatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stopwatch.swift; sourceTree = "<group>"; };
 		772F66092C2C787D003F2F94 /* TimeInterval+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeInterval+Extension.swift"; sourceTree = "<group>"; };
+		77676FA32C2CB51200291F31 /* EitherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EitherView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +63,7 @@
 			children = (
 				772F65F52C2C655F003F2F94 /* _80_StopwatchAppApp.swift */,
 				772F65F72C2C655F003F2F94 /* ContentView.swift */,
+				77676FA32C2CB51200291F31 /* EitherView.swift */,
 				772F66092C2C787D003F2F94 /* TimeInterval+Extension.swift */,
 				772F66052C2C683E003F2F94 /* EqualSize.swift */,
 				772F66072C2C69D5003F2F94 /* Stopwatch.swift */,
@@ -150,6 +153,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				772F66042C2C672A003F2F94 /* CircleButtonStyle.swift in Sources */,
+				77676FA42C2CB51200291F31 /* EitherView.swift in Sources */,
 				772F66062C2C683E003F2F94 /* EqualSize.swift in Sources */,
 				772F65F82C2C655F003F2F94 /* ContentView.swift in Sources */,
 				772F66082C2C69D5003F2F94 /* Stopwatch.swift in Sources */,
