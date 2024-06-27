@@ -7,14 +7,21 @@ struct ContentView: View {
     var body: some View {
         VStack {
 
-//            Text(stopwatch.total.formatted)
-//                .font(.largeTitle)
-//                .monospacedDigit()
+            TabView {
 
-            AnalogClockView(
-                time: stopwatch.total,
-                lapTime: stopwatch.laps.last?.0
-            )
+                Text(stopwatch.total.formatted)
+                    .flexibleFont { size in
+                            .system(size: size, weight: .light)
+                    }
+                                .font(.largeTitle)
+                                .monospacedDigit()
+
+                AnalogClockView(
+                    time: stopwatch.total,
+                    lapTime: stopwatch.laps.last?.0
+                )
+            }
+            .tabViewStyle(.page)
 
             HStack {
                 EitherView(if: stopwatch.isRunning) {
