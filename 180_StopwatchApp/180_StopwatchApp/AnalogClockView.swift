@@ -141,7 +141,7 @@ struct AnalogClockView: View {
 
 
                         if let lapTime {
-                            Pointer(showCircle: false)
+                            Pointer(showCircle: true)
                                 .stroke(.blue, lineWidth: 2)
                                 .rotationEffect(.degrees(lapTime * 6))
                         }
