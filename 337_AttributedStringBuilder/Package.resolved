@@ -1,0 +1,41 @@
+{
+  "pins" : [
+    {
+      "identity" : "swift-cmark",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/swiftlang/swift-cmark.git",
+      "state" : {
+        "branch" : "gfm",
+        "revision" : "fc07ab5da47975c5ef5f336acadfc02e8f706d30"
+      }
+    },
+    {
+      "identity" : "swift-markdown",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-markdown",
+      "state" : {
+        "branch" : "main",
+        "revision" : "2c126ce9fa33fc8b48258ee27ab51b33989161a3"
+      }
+    },
+    {
+      "identity" : "swift-syntax",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-syntax",
+      "state" : {
+        "branch" : "main",
+        "revision" : "2b6938022f14ed5ca6af9ff7e0ed654fdcc5b653"
+      }
+    },
+    {
+      "identity" : "swifthighlighting",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/chriseidhof/SwiftHighlighting",
+      "state" : {
+        "branch" : "main",
+        "revision" : "c4013575af677ca2d1e954001692e215af155c9b"
+      }
+    }
+  ],
+  "version" : 2
+}
