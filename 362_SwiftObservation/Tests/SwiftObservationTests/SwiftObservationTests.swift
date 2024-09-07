@@ -1,34 +1,36 @@
 import XCTest
 @testable import SwiftObservation
 
+@SwiftObservable
 final class Person {
 
-    var name: String {
-        get {
-            _registrar.access(self, \.name)
-            return _name
-        }
-        set {
-            _registrar.willSet(self, \.name)
-            _name = newValue
-        }
-    }
+    private var name: String = "Tom"
+    private var age: Int = 25
 
-    var age: Int {
-        get {
-            _registrar.access(self, \.age)
-            return _age
-        }
-        set {
-            _registrar.willSet(self, \.age)
-            _age = newValue
-        }
-    }
-
-    private var _name = "Tom"
-    private var _age = 25
-
-    private var _registrar = Registrar()
+//    var name: String {
+//        get {
+//            _registrar.access(self, \.name)
+//            return _name
+//        }
+//        set {
+//            _registrar.willSet(self, \.name)
+//            _name = newValue
+//        }
+//    }
+//
+//    var age: Int {
+//        get {
+//            _registrar.access(self, \.age)
+//            return _age
+//        }
+//        set {
+//            _registrar.willSet(self, \.age)
+//            _age = newValue
+//        }
+//    }
+//
+//    private var _name = "Tom"
+//    private var _age = 25
 }
 
 let sample = Person()
