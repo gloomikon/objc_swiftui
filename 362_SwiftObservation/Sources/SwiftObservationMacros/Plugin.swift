@@ -4,6 +4,7 @@ import SwiftSyntaxMacros
 @main struct Plugin: CompilerPlugin {
 
     let providingMacros: [Macro.Type] = [
-        ObservableMacro.self
+        ObservableMacro.self,
+        SwiftObservedPropertyMacro.self
     ]
 }
