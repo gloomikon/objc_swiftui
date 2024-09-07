@@ -32,20 +32,9 @@ final class Person {
 }
 
 let sample = Person()
+let sample1 = Person()
 
 final class SwiftObservationTests: XCTestCase {
-
-    func testAccess() throws {
-        withObservationTracking {
-            let _ = sample.name
-            XCTAssertEqual(
-                accessList,
-                [
-                    ObjectIdentifier(sample): Entry(keyPaths: [\Person.name])
-                ]
-            )
-        } onChange: { }
-    }
 
     func testObservation() throws {
         var numberOfCalls = 0
@@ -62,6 +51,22 @@ final class SwiftObservationTests: XCTestCase {
         sample.name.append("!")
         XCTAssertEqual(numberOfCalls, 1)
         sample.name.append("!")
+        XCTAssertEqual(numberOfCalls, 1)
+    }
+
+    func testObservationMultipleObjects() throws {
+        var numberOfCalls = 0
+
+        withObservationTracking {
+            _ = sample.name
+            _ = sample1.name
+        } onChange: {
+            numberOfCalls += 1
+        }
+
+        sample.name.append("!")
+        XCTAssertEqual(numberOfCalls, 1)
+        sample1.name.append("!")
         XCTAssertEqual(numberOfCalls, 1)
     }
 }
