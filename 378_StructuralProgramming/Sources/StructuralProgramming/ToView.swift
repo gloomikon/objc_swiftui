@@ -52,3 +52,10 @@ extension Bool: ToView {
         Text(self.description)
     }
 }
+
+public extension Structural where Structure: ToView {
+
+    var view: some View {
+        to.view
+    }
+}

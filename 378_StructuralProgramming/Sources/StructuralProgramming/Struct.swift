@@ -1,6 +1,12 @@
+public protocol Structural {
+    associatedtype Structure
+    var to: Structure { get }
+    static func from(_ structure: Structure) -> Self
+}
+
 public struct Struct<Properties> {
     public let name: String
-    public let properties: Properties
+    public var properties: Properties
 
     public init(name: String, properties: Properties) {
         self.name = name
@@ -10,7 +16,7 @@ public struct Struct<Properties> {
 
 public struct Property<Value> {
     public let name: String
-    public let value: Value
+    public var value: Value
 
     public init(name: String, value: Value) {
         self.name = name
@@ -19,8 +25,8 @@ public struct Property<Value> {
 }
 
 public struct List<Head, Tail> {
-    public let head: Head
-    public let tail: Tail
+    public var head: Head
+    public var tail: Tail
 
     public init(head: Head, tail: Tail) {
         self.head = head

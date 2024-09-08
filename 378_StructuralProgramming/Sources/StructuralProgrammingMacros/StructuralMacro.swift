@@ -85,3 +85,18 @@ public struct StructuralMacro: MemberMacro {
         ]
     }
 }
+
+extension StructuralMacro: ExtensionMacro {
+    public static func expansion(
+        of node: SwiftSyntax.AttributeSyntax,
+        attachedTo declaration: some SwiftSyntax.DeclGroupSyntax,
+        providingExtensionsOf type: some SwiftSyntax.TypeSyntaxProtocol,
+        conformingTo protocols: [SwiftSyntax.TypeSyntax],
+        in context: some SwiftSyntaxMacros.MacroExpansionContext
+    ) throws -> [SwiftSyntax.ExtensionDeclSyntax] {
+        let declSyntax: DeclSyntax = "extension \(type.trimmed): Structural { }"
+        return [
+            declSyntax.as(ExtensionDeclSyntax.self)!
+        ]
+    }
+}

@@ -12,17 +12,25 @@ struct Book {
 
 import SwiftUI
 
+var initial = Book(
+    title: "Thinking in SwiftUI",
+    published: .now,
+    authors: "gloomikon",
+    updated: true
+)
+
 struct ContentView: View {
-    var book = Book(
-        title: "Thinking in SwiftUI",
-        published: .now,
-        authors: "gloomikon",
-        updated: true
-    )
+
+    @State private var book = initial
 
     var body: some View {
-        book.to.view
-            .padding()
+        VStack {
+            book.view
+            Form {
+                book.edit($book)
+            }
+        }
+        .padding()
     }
 }
 
