@@ -1,18 +1,18 @@
 import SwiftUI
 
-protocol ToView {
+public protocol ToView {
     associatedtype V: View
     @ViewBuilder var view: V { get }
 }
 
 extension Empty: ToView {
-    var view: some View {
+    public var view: some View {
         EmptyView()
     }
 }
 
 extension Property: ToView where Value: ToView {
-    var view: some View {
+    public var view: some View {
         LabeledContent(name) {
             value.view
         }
@@ -20,14 +20,14 @@ extension Property: ToView where Value: ToView {
 }
 
 extension List: ToView where Head: ToView, Tail: ToView {
-    var view: some View {
+    public var view: some View {
         head.view
         tail.view
     }
 }
 
 extension Struct: ToView where Properties: ToView {
-    var view: some View {
+    public var view: some View {
         VStack {
             Text(name).bold()
             properties.view
@@ -36,13 +36,19 @@ extension Struct: ToView where Properties: ToView {
 }
 
 extension String: ToView {
-    var view: some View {
+    public var view: some View {
         Text(self)
     }
 }
 
 extension Date: ToView {
-    var view: some View {
+    public var view: some View {
         Text(self, format: .dateTime)
+    }
+}
+
+extension Bool: ToView {
+    public var view: some View {
+        Text(self.description)
     }
 }
