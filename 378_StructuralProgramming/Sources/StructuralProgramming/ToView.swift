@@ -11,6 +11,12 @@ extension Empty: ToView {
     }
 }
 
+extension Nothing: ToView {
+    public var view: some View {
+        EmptyView()
+    }
+}
+
 extension Property: ToView where Value: ToView {
     public var view: some View {
         LabeledContent(name) {
@@ -31,6 +37,26 @@ extension Struct: ToView where Properties: ToView {
         VStack {
             Text(name).bold()
             properties.view
+        }
+    }
+}
+
+extension Enum: ToView where Cases: ToView {
+    public var view: some View {
+        VStack {
+            Text(name).bold()
+            cases.view
+        }
+    }
+}
+
+extension Choice: ToView where First: ToView, Second: ToView {
+    public var view: some View {
+        switch self {
+        case .first(let first):
+            first.view
+        case .second(let second):
+            second.view
         }
     }
 }

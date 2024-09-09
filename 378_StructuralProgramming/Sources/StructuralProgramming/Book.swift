@@ -8,34 +8,9 @@ struct Book {
     let updated: Bool
 }
 
-#if DEBUG
+@Structural
+enum BookType {
 
-import SwiftUI
-
-var initial = Book(
-    title: "Thinking in SwiftUI",
-    published: .now,
-    authors: "gloomikon",
-    updated: true
-)
-
-struct ContentView: View {
-
-    @State private var book = initial
-
-    var body: some View {
-        VStack {
-            book.view
-            Form {
-                book.edit($book)
-            }
-        }
-        .padding()
-    }
+    case paperback
+    case hardcover(title: String)
 }
-
-#Preview {
-    ContentView()
-}
-
-#endif

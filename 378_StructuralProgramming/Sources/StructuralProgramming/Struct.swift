@@ -14,6 +14,16 @@ public struct Struct<Properties> {
     }
 }
 
+public struct Enum<Cases> {
+    public let name: String
+    public let cases: Cases
+
+    public init(name: String, cases: Cases) {
+        self.name = name
+        self.cases = cases
+    }
+}
+
 public struct Property<Value> {
     public let name: String
     public var value: Value
@@ -34,9 +44,16 @@ public struct List<Head, Tail> {
     }
 }
 
+public enum Choice<First, Second> {
+    case first(First)
+    case second(Second)
+}
+
 public struct Empty {
 
     public init() {
 
     }
 }
+
+public enum Nothing { }
