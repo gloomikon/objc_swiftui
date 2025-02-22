@@ -31,19 +31,24 @@ func sample() async throws {
 }
  */
 
+/*
 func sample() async throws {
     let start = Date.now
     let url = Bundle.main.url(forResource: "enwik8", withExtension: "zlib")!
-
-    var counter = 0
-
     let fileHandle = try FileHandle(forReadingFrom: url)
-    for try await event in fileHandle.bytes.chunked.decompressed.xmlEvents {
-        guard case let .didStart(element) = event else { continue }
-        print(element)
-        counter += 1
+    for try await page in fileHandle.bytes.chunked.decompressed.xmlEvents.pages {
+        print(page)
     }
+    print("Duration: \(Date.now.timeIntervalSince(start))")
+}
+*/
 
-    print(counter)
+
+func sample() async throws {
+    let start = Date.now
+    let (bytes, _) = try await URLSession.shared.bytes(from: URL(string: "https://d2sazdeahkz1yk.cloudfront.net/sample/enwik8.zlib")!)
+    for try await page in bytes.chunked.decompressed.xmlEvents.pages {
+        print(page)
+    }
     print("Duration: \(Date.now.timeIntervalSince(start))")
 }
