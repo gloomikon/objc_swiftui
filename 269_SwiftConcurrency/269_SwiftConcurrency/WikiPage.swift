@@ -84,6 +84,7 @@ struct ParseError: Error {
 
 }
 
+/*
 struct Pages<Base: AsyncSequence>: AsyncSequence where Base.Element == XMLEvent {
 
     typealias Element = Page
@@ -103,10 +104,14 @@ struct Pages<Base: AsyncSequence>: AsyncSequence where Base.Element == XMLEvent 
         AsyncIterator(base: base.makeAsyncIterator())
     }
 }
+*/
 
 extension AsyncSequence where Element == XMLEvent {
 
-    var pages: Pages<Self> {
-        Pages(base: self)
+    var pages: AsyncThrowingStream<Page, Error> {
+        var iterator = makeAsyncIterator()
+        return AsyncThrowingStream {
+            try await iterator.parsePage()
+        }
     }
 }
