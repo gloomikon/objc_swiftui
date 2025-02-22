@@ -38,8 +38,9 @@ func sample() async throws {
     var counter = 0
 
     let fileHandle = try FileHandle(forReadingFrom: url)
-    for try await chunk in fileHandle.bytes.chunked.decompressed {
-        print(chunk)
+    for try await event in fileHandle.bytes.chunked.decompressed.xmlEvents {
+        guard case let .didStart(element) = event else { continue }
+        print(element)
         counter += 1
     }
 
