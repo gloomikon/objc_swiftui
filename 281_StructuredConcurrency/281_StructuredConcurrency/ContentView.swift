@@ -21,9 +21,7 @@ struct DownloadView: View {
             switch model.state {
             case .notStarted:
                 Button("Start") {
-                    Task { [model] in
-                        await model.start()
-                    }
+                    model.start()
                 }
             case .started:
                 HStack {
@@ -33,17 +31,13 @@ struct DownloadView: View {
                     }
 
                     Button("Pause") {
-                        Task { [model] in
-                            await model.pause()
-                        }
+                        model.pause()
                     }
                 }
             case .paused(resumeData: _):
                 Text("Paused...")
                 Button("Resume") {
-                    Task {
-                        await model.start()
-                    }
+                    model.start()
                 }
             case let .done(url):
                 Text("Done: \(url)")

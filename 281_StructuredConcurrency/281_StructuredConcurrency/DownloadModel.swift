@@ -1,7 +1,7 @@
 import Foundation
 
 @MainActor
-final class DownloadModel: ObservableObject, Sendable {
+final class DownloadModel: ObservableObject, Sendable, AsyncDownloadDelegate {
     let url: URL
     init(_ url: URL) {
         self.url = url
@@ -21,7 +21,7 @@ final class DownloadModel: ObservableObject, Sendable {
 
     private var downloadTask: URLSessionDownloadTask?
 
-    func start() async {
+    func start() {
         let task: URLSessionDownloadTask =
         if case let .paused(data?) = state {
             URLSession.shared.downloadTask(withResumeData: data)
@@ -31,40 +31,25 @@ final class DownloadModel: ObservableObject, Sendable {
 
         state = .started
 
+        delegate.delegate = self
         task.delegate = delegate
         task.resume()
         downloadTask = task
-
-        let stream = AsyncStream<DownloadModelDelegate.Event> { continuation in
-            delegate.onEvent = { event in
-                continuation.yield(event)
-
-                switch event {
-                case .didCancel, .didFinish:
-                    continuation.finish()
-                default:
-                    break
-                }
-            }
-        }
-
-        for await event in stream {
-            switch event {
-            case .didCancel:
-                ()
-            case .didFinish(let url):
-                state = .done(url)
-            case .didWrite(let bytesWritten, let bytesExpected):
-                progress = (bytesWritten: bytesWritten, bytesExpected: bytesExpected)
-            }
-        }
-
-        print("Finished")
     }
 
-    func pause() async {
-        let data = await downloadTask?.cancelByProducingResumeData()
-        state = .paused(resumeData: data)
+    func pause() {
+        Task {
+            let data = await downloadTask?.cancelByProducingResumeData()
+            state = .paused(resumeData: data)
+        }
+    }
+
+    func didFinishDownloading(location: URL) async {
+        state = .done(location)
+    }
+
+    func didWrite(bytesWritten: Int64, bytesExpected: Int64) async {
+        progress = (bytesWritten, bytesExpected)
     }
 }
 
@@ -78,31 +63,22 @@ final class DownloadModel: ObservableObject, Sendable {
 //    }
 //}
 
+protocol AsyncDownloadDelegate: AnyObject {
+    func didFinishDownloading(location: URL) async
+    func didWrite(bytesWritten: Int64, bytesExpected: Int64) async
+}
+
 final class DownloadModelDelegate: NSObject, URLSessionDownloadDelegate {
 
-    enum Event {
-        case didFinish(URL)
-        case didWrite(bytesWritten: Int64, bytesExpected: Int64)
-        case didCancel
-    }
-
-    var onEvent: (Event) -> () = { _ in }
+    weak var delegate: AsyncDownloadDelegate?
 
     func urlSession(
         _ session: URLSession,
         downloadTask: URLSessionDownloadTask,
         didFinishDownloadingTo location: URL
     ) {
-        onEvent(.didFinish(location))
-    }
-
-    func urlSession(
-        _ session: URLSession,
-        task: URLSessionTask,
-        didCompleteWithError error: (any Error)?
-    ) {
-        if let error = error as? NSError, error.code == CFNetworkErrors.cfurlErrorCancelled.rawValue {
-            onEvent(.didCancel)
+        Task {
+            await delegate?.didFinishDownloading(location: location)
         }
     }
 
@@ -113,9 +89,11 @@ final class DownloadModelDelegate: NSObject, URLSessionDownloadDelegate {
         totalBytesWritten: Int64,
         totalBytesExpectedToWrite: Int64
     ) {
-        onEvent(.didWrite(
-            bytesWritten: totalBytesWritten,
-            bytesExpected: totalBytesExpectedToWrite
-        ))
+        Task {
+            await delegate?.didWrite(
+                bytesWritten: totalBytesWritten,
+                bytesExpected: totalBytesExpectedToWrite
+            )
+        }
     }
 }
