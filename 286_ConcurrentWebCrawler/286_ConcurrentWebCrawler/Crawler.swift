@@ -1,25 +1,47 @@
 import Foundation
 
 actor Queue {
-    var items: Set<URL> = []
-    var inProgress: Set<URL> = []
 
-    func dequeue() -> URL? {
-        guard let result = items.popFirst() else { return nil }
-        inProgress.insert(result)
-        return result
+    private var items: Set<URL> = []
+    private var inProgress: Set<URL> = []
+
+    private var pending: [() -> Void] = []
+
+    func dequeue() async -> URL? {
+        if let result = items.popFirst() {
+            inProgress.insert(result)
+            return result
+        } else if done {
+            return nil
+        } else {
+            await withCheckedContinuation { continuation in
+                pending.append(continuation.resume)
+            }
+            return await dequeue()
+        }
     }
 
     func finish(_ item: URL) {
         inProgress.remove(item)
+        if done {
+            flushPending()
+        }
     }
 
-    var done: Bool {
+    private var done: Bool {
         items.isEmpty && inProgress.isEmpty
     }
 
     func add(newItems: [URL]) {
         items.formUnion(newItems)
+        flushPending()
+    }
+
+    private func flushPending() {
+        for continuation in pending {
+            continuation()
+        }
+        pending.removeAll()
     }
 }
 
@@ -45,11 +67,7 @@ final class Crawler: ObservableObject {
             for i in 0..<4 {
                 group.addTask {
                     var numberOfJobs = 0
-                    while await !queue.done {
-                        guard let job = await queue.dequeue() else {
-                            try await Task.sleep(nanoseconds: 100)
-                            continue
-                        }
+                    while let job = await queue.dequeue() {
                         let page = try await URLSession.shared.page(from: job)
                         let seen = await self.seenURLs()
                         let newURLs = page.outgoingLinks.filter { url in
