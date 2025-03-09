@@ -5,6 +5,8 @@ actor Queue {
     private var items: Set<URL> = []
     private var inProgress: Set<URL> = []
 
+    private var seen: Set<URL> = []
+
     private var pending: [() -> Void] = []
 
     func dequeue() async -> URL? {
@@ -33,6 +35,8 @@ actor Queue {
     }
 
     func add(newItems: [URL]) {
+        let newItems = newItems.filter { !seen.contains($0) }
+        seen.formUnion(newItems)
         items.formUnion(newItems)
         flushPending()
     }
@@ -45,41 +49,48 @@ actor Queue {
     }
 }
 
-@MainActor
-final class Crawler: ObservableObject {
-    @Published var state: [URL: Page] = [:]
+typealias CrawlerStream = AsyncThrowingStream<Page, Error>
 
-    private func seenURLs() -> Set<URL> {
-        Set(state.keys)
-    }
+fileprivate func crawl(
+    url: URL,
+    continuation: CrawlerStream.Continuation
+) async throws {
+    let basePrefix = url.absoluteString
 
-    private func add(_ page: Page) {
-        state[page.url] = page
-    }
-
-    func crawl(url: URL) async throws {
-        let basePrefix = url.absoluteString
-
-        let queue = Queue()
-        await queue.add(newItems: [url])
-
-        await withThrowingTaskGroup(of: Void.self) { group in
-            for i in 0..<4 {
-                group.addTask {
-                    var numberOfJobs = 0
-                    while let job = await queue.dequeue() {
-                        let page = try await URLSession.shared.page(from: job)
-                        let seen = await self.seenURLs()
-                        let newURLs = page.outgoingLinks.filter { url in
-                            url.absoluteString.hasPrefix(basePrefix) && !seen.contains(url)
-                        }
-                        await queue.add(newItems: newURLs)
-                        await self.add(page)
-                        await queue.finish(page.url)
-                        numberOfJobs += 1
+    let queue = Queue()
+    await queue.add(newItems: [url])
+    try await withThrowingTaskGroup(of: Void.self) { group in
+        for i in 0..<4 {
+            group.addTask {
+                var numberOfJobs = 0
+                while let job = await queue.dequeue() {
+                    let page = try await URLSession.shared.page(from: job)
+                    let newURLs = page.outgoingLinks.filter { url in
+                        url.absoluteString.hasPrefix(basePrefix)
                     }
-                    print("Worker \(i) did \(numberOfJobs) jobs")
+                    await queue.add(newItems: newURLs)
+                    continuation.yield(page)
+                    await queue.finish(page.url)
+                    numberOfJobs += 1
                 }
+                print("Worker \(i) did \(numberOfJobs) jobs")
+            }
+        }
+
+        for try await _ in group {
+
+        }
+    }
+}
+
+func crawl(url: URL) -> CrawlerStream {
+    CrawlerStream { continuation in
+        Task {
+            do {
+                try await crawl(url: url, continuation: continuation)
+                continuation.finish(throwing: nil)
+            } catch {
+                continuation.finish(throwing: error)
             }
         }
     }
