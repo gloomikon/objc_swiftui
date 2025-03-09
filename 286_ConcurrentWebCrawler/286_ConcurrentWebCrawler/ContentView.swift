@@ -5,14 +5,21 @@ struct ContentView: View {
     @State private var items: [URL: Page] = [:]
     @State private var loading = false
 
-    var body: some View {
-        List {
-            ForEach(Array(items.keys.sorted(by: { $0.absoluteString < $1.absoluteString })), id: \.self) { url in
-                HStack {
-                    Text(url.absoluteString)
-                    Text(items[url]!.title)
-                }
+    @State private var cancelled = false
 
+    var body: some View {
+        VStack {
+            Button("Cancel") {
+                cancelled = true
+            }
+            List {
+                ForEach(Array(items.keys.sorted(by: { $0.absoluteString < $1.absoluteString })), id: \.self) { url in
+                    HStack {
+                        Text(url.absoluteString)
+                        Text(items[url]!.title)
+                    }
+
+                }
             }
         }
         .overlay(
@@ -23,7 +30,8 @@ struct ContentView: View {
         )
         .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .task {
+        .task(id: cancelled) {
+            if cancelled { return }
             do {
                 let results = crawl(url: URL(string: "https://talk.objc.io/")!)
                 for try await page in results {

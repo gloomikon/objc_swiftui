@@ -10,6 +10,7 @@ actor Queue {
     private var pending: [() -> Void] = []
 
     func dequeue() async -> URL? {
+        if Task.isCancelled { return nil }
         if let result = items.popFirst() {
             inProgress.insert(result)
             return result
@@ -41,7 +42,7 @@ actor Queue {
         flushPending()
     }
 
-    private func flushPending() {
+    fileprivate func flushPending() {
         for continuation in pending {
             continuation()
         }
@@ -65,6 +66,7 @@ fileprivate func crawl(
                 var numberOfJobs = 0
                 while let job = await queue.dequeue() {
                     let page = try await URLSession.shared.page(from: job)
+                    try await Task.sleep(nanoseconds: NSEC_PER_SEC*10)
                     let newURLs = page.outgoingLinks.filter { url in
                         url.absoluteString.hasPrefix(basePrefix)
                     }
@@ -77,21 +79,30 @@ fileprivate func crawl(
             }
         }
 
-        for try await _ in group {
+        do {
+            for try await _ in group {
 
+            }
+        } catch {
+            await queue.flushPending()
+            throw error
         }
     }
 }
 
 func crawl(url: URL) -> CrawlerStream {
     CrawlerStream { continuation in
-        Task {
+        let task = Task {
             do {
                 try await crawl(url: url, continuation: continuation)
                 continuation.finish(throwing: nil)
             } catch {
                 continuation.finish(throwing: error)
             }
+        }
+        continuation.onTermination = { @Sendable _ in
+            print("onTermination")
+            task.cancel()
         }
     }
 }
